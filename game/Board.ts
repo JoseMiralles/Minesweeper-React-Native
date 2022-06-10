@@ -1,37 +1,81 @@
 
-export interface ISquare {
+type squareStatus = "FLAGGED" | "REVEALED" | "DEFAULT";
+
+interface ISquare {
     mine: boolean;
-    status: "FLAGGED" | "REVEALED" | "DEFAULT";
+    status: squareStatus;
     number: number;
 }
 
 export default class Board {
 
+    public mineTriggered = false;
+    public completed = false;
+    
     private grid: ISquare[][] = [];
+    private openedSquares = 0;
+    private goalSquares;
 
     constructor (
         private size: number,
         private totalMines: number
     ) {
         if ((size * size) < totalMines) throw new Error("Too many mines!");
+        this.goalSquares = (size * size) - totalMines;
         this.generateGrid();
         this.print();
     }
 
-    private print() {
+    /**
+     * Assigns the given status to the given square.
+     * 
+     * @param x row
+     * @param y column
+     * @param newStatus the status to assign the square
+     * @returns TRUE if the game should continue.
+     */
+    public modifySquare (
+        x: number,
+        y: number,
+        newStatus: squareStatus
+    ): boolean {
+
+        if (this.isValidPosition(x,y) === true){
+
+            const square = this.grid[x][y];
+            if (square.status === "REVEALED") return true; // Do not modify if it's already revealed.
+            square.status = newStatus;
+
+            if (square.status === "REVEALED" && square.mine === true) {
+                this.mineTriggered = true;
+                return false;
+            } else if (square.status === "REVEALED") {
+                // TODO move this to it's own method, and add graph traversal to islands.
+                this.openedSquares ++;
+                if (this.openedSquares >= this.goalSquares) {
+                    this.completed = true;
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    public print(): string {
+        let res = "";
         this.grid.forEach((row, x) => {
-            let rowString = "";
             row.forEach((square, y) => {
                 if (square.mine === true) {
-                    rowString += "*";
-                } else if (square.number > 0) {
-                    rowString += square.number;
+                    res += "*";
                 } else {
-                    rowString += " ";
+                    res += square.number;
                 }
+                res += " "
             });
-            console.log(rowString + "\n");
-        })
+            res += "\n";
+        });
+        return res;
     }
 
     private generateGrid () {
@@ -72,13 +116,16 @@ export default class Board {
                 let count = 0;
 
                 offsets.forEach(offset => {
+                    console.log(this.isValidPosition(x + offset.x, y + offset.y));
                     if (
                         this.isValidPosition(x + offset.x, y + offset.y) &&
-                        this.grid[x][y].mine === true
+                        this.grid[(x + offset.x)][(y + offset.y)].mine === true
                     ) {
                         count ++;
                     }
                 });
+
+                square.number = count;
             })
         })
     };
