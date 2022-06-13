@@ -7,7 +7,7 @@ export default class Game {
     public board: Board;
 
     constructor (
-        size: number,
+        public size: number,
         totalMines: number
     ) {
         this.board = new Board(size, totalMines);

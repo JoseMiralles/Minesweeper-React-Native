@@ -5,6 +5,7 @@ interface ISquare {
     mine: boolean;
     status: squareStatus;
     number: number;
+    pos: [number, number];
 }
 
 export default class Board {
@@ -38,6 +39,8 @@ export default class Board {
         y: number,
         newStatus: squareStatus
     ): boolean {
+
+        debugger;
 
         if (this.isValidPosition(x,y) === true){
 
@@ -78,11 +81,16 @@ export default class Board {
     }
 
     private generateGrid () {
+
+        let r = 0;
         
         // Populate Array with default square.
         this.grid = Array.from({length: this.size}, () => {
+            r ++;
+            let c = 0;
             return Array.from({length: this.size}, () => {
-                return {mine: false, status: "DEFAULT", number: 0};
+                c ++;
+                return {mine: false, status: "DEFAULT", number: 0, pos: [r - 1, c - 1]};
             });
         });
 

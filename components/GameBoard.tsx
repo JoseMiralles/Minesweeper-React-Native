@@ -1,40 +1,48 @@
-import React from "react";
-import { View, StyleSheet, FlatList, Text, ScrollView } from "react-native";
+import React, { useEffect } from "react";
+import { View, StyleSheet, FlatList, Text, ScrollView, TouchableOpacity } from "react-native";
+import { useSetRecoilState } from "recoil";
 import Game from "../game/Game";
+import { gameState } from "../state";
 
 interface IParams {
     game: Game
 }
 
 const GameBoard = ({game}: IParams) => {
+
+    const setGame = useSetRecoilState(gameState);
+
+    const onPress = ([row, col]: [number, number]) => {
+        return () => {
+            console.log(`[${row}, ${col}]`);
+            game.board.modifySquare(
+                row, col, "REVEALED"
+            )
+            setGame(game);
+        };
+    };
     
     return (
         <View>
-            <ScrollView>
-                {game.board.grid.map((row, idx) => {
-
+            <FlatList
+                data={game.board.grid.flat()}
+                numColumns={game.size}
+                renderItem={({item: square}) => {
                     return (
-                        <FlatList
-                            key={idx}
-                            horizontal={true}
-                            data={row}
-                            style={styles.row}
-                            renderItem={({item: square}) => {
-
-                                return (
-                                    <View
-                                        style={styles.square}
-                                    >
-                                        <Text>
-                                            {square.number}
-                                        </Text>
-                                    </View>
-                                );
-                            }}
-                        />
+                        <TouchableOpacity
+                            onPress={onPress(square.pos)}
+                            style={styles.square}>
+                            <Text>
+                                {
+                                    square.status === "REVEALED"
+                                    ? square.number
+                                    : "/"
+                                }
+                            </Text>
+                        </TouchableOpacity>
                     );
-                })}
-            </ScrollView>
+                }}
+            />
         </View>
     );
 };
