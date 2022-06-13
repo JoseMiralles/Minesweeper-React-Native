@@ -1,8 +1,7 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { View, StyleSheet, FlatList, Text, ScrollView, TouchableOpacity } from "react-native";
 import { useSetRecoilState } from "recoil";
 import Game from "../game/Game";
-import { gameState } from "../state";
 
 interface IParams {
     game: Game
@@ -10,15 +9,12 @@ interface IParams {
 
 const GameBoard = ({game}: IParams) => {
 
-    const setGame = useSetRecoilState(gameState);
+    const forceUpdate = useState(0)[1];
 
     const onPress = ([row, col]: [number, number]) => {
         return () => {
-            console.log(`[${row}, ${col}]`);
-            game.board.modifySquare(
-                row, col, "REVEALED"
-            )
-            setGame(game);
+            game.board.digSquare(row, col);
+            forceUpdate(0);
         };
     };
     

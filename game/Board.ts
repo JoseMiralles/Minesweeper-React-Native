@@ -27,41 +27,60 @@ export default class Board {
     }
 
     /**
-     * Assigns the given status to the given square.
+     * Digs the given square.
      * 
      * @param x row
      * @param y column
-     * @param newStatus the status to assign the square
-     * @returns TRUE if the game should continue.
      */
-    public modifySquare (
+    public digSquare (
         x: number,
         y: number,
-        newStatus: squareStatus
-    ): boolean {
+    ): void {
 
         debugger;
 
         if (this.isValidPosition(x,y) === true){
 
             const square = this.grid[x][y];
-            if (square.status === "REVEALED") return true; // Do not modify if it's already revealed.
-            square.status = newStatus;
+            square.status = "REVEALED";
 
-            if (square.status === "REVEALED" && square.mine === true) {
+            if (square.mine) {
                 this.mineTriggered = true;
-                return false;
-            } else if (square.status === "REVEALED") {
-                // TODO move this to it's own method, and add graph traversal to islands.
-                this.openedSquares ++;
-                if (this.openedSquares >= this.goalSquares) {
-                    this.completed = true;
-                    return false;
+                return;
+            }
+
+            /**
+             * Check if this is a "zero" square.
+             * If it is, reveal the island of "zeroes" connected to
+             * this square.
+             */
+            if (square.number === 0) {
+
+                const que = [square];
+                const transforms = [
+                    {x:0, y:-1},
+                    {x:0, y:1},
+                    {x:-1, y:0},
+                    {x:1, y:0},
+                ];
+
+                while (que.length) {
+
+                    const current = que.pop();
+                    if (current) current.status = "REVEALED";
+                    transforms.forEach(pos => {
+                        if (
+                            this.isValidPosition(x + pos.x, y + pos.y) &&
+                            this.grid[x + pos.x][y + pos.y].status !== "REVEALED",
+                            this.grid[x + pos.x][y + pos.y].number === 0 &&
+                            this.grid[x + pos.x][y + pos.y].mine === false
+                        ) {
+                            que.unshift(this.grid[x + pos.x][y + pos.y]);
+                        }
+                    });
                 }
             }
         }
-
-        return true;
     }
 
     public print(): string {

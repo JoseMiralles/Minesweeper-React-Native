@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { TextInput, View, Text, Button, StyleSheet } from "react-native";
 import { useSetRecoilState } from "recoil";
 import Game from "../game/Game";
-import { gameState } from "../state";
+import { gameParamsState } from "../state";
 
 const NewGameForm = () => {
 
@@ -10,14 +10,13 @@ const NewGameForm = () => {
     const [totalMines, setTotalMines] = useState(5);
     const [errors, setErrors] = useState<string[]>([]);
 
-    const setGame = useSetRecoilState(gameState);
+    const setGameParams = useSetRecoilState(gameParamsState);
 
     const createGame = () => {
         if ((size * size) < totalMines) {
             setErrors(["There are more mines than squares!"]);
         } else {
-            const game = new Game(size, totalMines);
-            setGame(game);
+            setGameParams({ size, totalMines });
         }
     };
 

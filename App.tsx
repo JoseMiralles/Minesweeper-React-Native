@@ -1,18 +1,22 @@
-import { View, Text, StyleSheet } from "react-native";
+import { View, StyleSheet } from "react-native";
 import { RecoilRoot, useRecoilValue } from "recoil";
 import GameBoard from "./components/GameBoard";
 import NewGameForm from "./components/NewGameForm";
-import { gameState } from "./state";
+import Game from "./game/Game";
+import { gameParamsState } from "./state";
 
 const InnerApp = () => {
 
-  const game = useRecoilValue(gameState);
+  const gameParams = useRecoilValue(gameParamsState);
+
+  let game: Game | undefined;
+  if (gameParams) game = new Game(gameParams.size, gameParams.totalMines);
 
   return (
     <View style={styleSheet.main}>
 
     {
-      game ?
+      game !== undefined ?
         <GameBoard game={game}/>
         : <NewGameForm />
     }
