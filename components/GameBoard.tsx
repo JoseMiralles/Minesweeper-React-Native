@@ -9,12 +9,13 @@ interface IParams {
 
 const GameBoard = ({game}: IParams) => {
 
-    const forceUpdate = useState(0)[1];
+    const [totalMoves, setTotalMoves] = useState(0);
 
     const onPress = ([row, col]: [number, number]) => {
         return () => {
             game.board.digSquare(row, col);
-            forceUpdate(0);
+            console.log(game.board.print());
+            setTotalMoves(totalMoves + 1);
         };
     };
     

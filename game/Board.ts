@@ -37,8 +37,6 @@ export default class Board {
         y: number,
     ): void {
 
-        debugger;
-
         if (this.isValidPosition(x,y) === true){
 
             const square = this.grid[x][y];
@@ -64,20 +62,31 @@ export default class Board {
                     {x:1, y:0},
                 ];
 
-                while (que.length) {
+                while (que.length > 0) {
+
+                    debugger;
 
                     const current = que.pop();
-                    if (current) current.status = "REVEALED";
-                    transforms.forEach(pos => {
-                        if (
-                            this.isValidPosition(x + pos.x, y + pos.y) &&
-                            this.grid[x + pos.x][y + pos.y].status !== "REVEALED",
-                            this.grid[x + pos.x][y + pos.y].number === 0 &&
-                            this.grid[x + pos.x][y + pos.y].mine === false
-                        ) {
-                            que.unshift(this.grid[x + pos.x][y + pos.y]);
-                        }
-                    });
+
+                    if (current) {
+
+                        const x = current.pos[0];
+                        const y = current.pos[1];
+                        console.log(`${current?.pos[0]},${current?.pos[1]}:\t${current?.status}`);
+                        
+                        transforms.forEach(pos => {
+
+                            if (
+                                this.isValidPosition(x + pos.x, y + pos.y) &&
+                                this.grid[x + pos.x][y + pos.y].status !== "REVEALED" &&
+                                this.grid[x + pos.x][y + pos.y].number === 0 &&
+                                this.grid[x + pos.x][y + pos.y].mine === false
+                            ) {
+                                que.unshift(this.grid[x + pos.x][y + pos.y]);
+                                this.grid[x + pos.x][y + pos.y].status = "REVEALED";
+                            }
+                        });
+                    }
                 }
             }
         }
@@ -89,7 +98,10 @@ export default class Board {
             row.forEach((square, y) => {
                 if (square.mine === true) {
                     res += "*";
+                } else if (square.status === "REVEALED") {
+                    res += square.number;
                 } else {
+                    // res += "/";
                     res += square.number;
                 }
                 res += " "

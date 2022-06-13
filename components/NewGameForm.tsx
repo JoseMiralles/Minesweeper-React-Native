@@ -6,8 +6,8 @@ import { gameParamsState } from "../state";
 
 const NewGameForm = () => {
 
-    const [size, setSize] = useState(4);
-    const [totalMines, setTotalMines] = useState(5);
+    const [size, setSize] = useState(10);
+    const [totalMines, setTotalMines] = useState(2);
     const [errors, setErrors] = useState<string[]>([]);
 
     const setGameParams = useSetRecoilState(gameParamsState);
