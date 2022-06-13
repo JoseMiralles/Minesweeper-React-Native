@@ -11,8 +11,8 @@ export default class Board {
 
     public mineTriggered = false;
     public completed = false;
+    public grid: ISquare[][] = [];
     
-    private grid: ISquare[][] = [];
     private openedSquares = 0;
     private goalSquares;
 
@@ -23,7 +23,6 @@ export default class Board {
         if ((size * size) < totalMines) throw new Error("Too many mines!");
         this.goalSquares = (size * size) - totalMines;
         this.generateGrid();
-        this.print();
     }
 
     /**
@@ -116,7 +115,6 @@ export default class Board {
                 let count = 0;
 
                 offsets.forEach(offset => {
-                    console.log(this.isValidPosition(x + offset.x, y + offset.y));
                     if (
                         this.isValidPosition(x + offset.x, y + offset.y) &&
                         this.grid[(x + offset.x)][(y + offset.y)].mine === true

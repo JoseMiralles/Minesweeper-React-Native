@@ -1,20 +1,19 @@
-import { useState } from "react";
 import { View, Text, StyleSheet } from "react-native";
-import { RecoilRoot, useRecoilState } from "recoil";
+import { RecoilRoot, useRecoilValue } from "recoil";
+import GameBoard from "./components/GameBoard";
 import NewGameForm from "./components/NewGameForm";
-import Game from "./game/Game";
 import { gameState } from "./state";
 
 const InnerApp = () => {
 
-  const [game] = useRecoilState(gameState);
+  const game = useRecoilValue(gameState);
 
   return (
     <View style={styleSheet.main}>
 
     {
       game ?
-        <Text>{game.board.print()}</Text>
+        <GameBoard game={game}/>
         : <NewGameForm />
     }
 
