@@ -1,13 +1,14 @@
 import React, { useState } from "react";
-import { TextInput, View, Text, Button, StyleSheet } from "react-native";
+import { TextInput, View, Text, Button, StyleSheet, KeyboardAvoidingView } from "react-native";
 import { useSetRecoilState } from "recoil";
 import Game from "../game/Game";
 import { gameParamsState } from "../state";
+import { BGColors, FGColors, appStyles } from "./styles";
 
 const NewGameForm = () => {
 
-    const [size, setSize] = useState(10);
-    const [totalMines, setTotalMines] = useState(25);
+    const [size, setSize] = useState(24);
+    const [totalMines, setTotalMines] = useState(15);
     const [errors, setErrors] = useState<string[]>([]);
 
     const setGameParams = useSetRecoilState(gameParamsState);
@@ -21,32 +22,48 @@ const NewGameForm = () => {
     };
 
     return (
-        <View style={styles.main}>
+        <KeyboardAvoidingView
+            style={styles.main}
+            behavior="padding"
+            enabled
+        >
 
             <View>
-                {errors.map((e,i) => (<Text style={styles.error} key={i}>{e}</Text>))}
+                <Text style={styles.title}>
+                    Minesweeper
+                </Text>
+                <Text style={styles.subtitle}>
+                    by Jose Miralles
+                </Text>
             </View>
 
-            <Text style={styles.label}>Board Size:</Text>
-            <TextInput
-                keyboardType="numeric"
-                style={styles.TextInput}
-                value={size.toString()}
-                onChangeText={(e)=>{setSize((e as unknown as number))}}/>
+            <View style={styles.form}>
+                <View>
+                    {errors.map((e,i) => (<Text style={styles.error} key={i}>{e}</Text>))}
+                </View>
 
-            <Text style={styles.label}>Total Mines:</Text>
-            <TextInput
-                keyboardType="numeric"
-                style={styles.TextInput}
-                value={totalMines.toString()}
-                onChangeText={(e)=>{setTotalMines((e as unknown as number))}}
-            />
+                <Text style={styles.label}>Board Size:</Text>
+                <TextInput
+                    keyboardType="numeric"
+                    style={styles.TextInput}
+                    value={size.toString()}
+                    onChangeText={(e)=>{setSize((e as unknown as number))}}/>
+
+                <Text style={styles.label}>Total Mines:</Text>
+                <TextInput
+                    keyboardType="numeric"
+                    style={styles.TextInput}
+                    value={totalMines.toString()}
+                    onChangeText={(e)=>{setTotalMines((e as unknown as number))}}
+                />
+            </View>
 
             <Button
+                color={styles.button.color}
                 title="play"
                 onPress={createGame}
             />
-        </View>
+        </KeyboardAvoidingView>
     );
 }
 
@@ -54,18 +71,40 @@ const styles = StyleSheet.create({
     main: {
         margin: 25,
         padding: 25,
-        justifyContent: "center",
+        flexDirection: "column",
+        flexGrow: 1,
+        justifyContent: "space-around",
         alignContent: "center",
+        maxHeight: 800
+    },
+    form: {
+        flexDirection: "column",
+    },
+    title: {
+        fontSize: 30,
+        ...appStyles.text,
+        textAlign: "center",
+        margin: 5,
+        fontWeight: "bold"
+    },
+    subtitle: {
+        textAlign: "center",
+        ...appStyles.text,
+        margin: 5
     },
     label: {
-        color: "dimgray"
+        color: BGColors.secondary
     },
     TextInput: {
         padding: 10,
-        borderColor: "dimgray",
+        borderColor: BGColors.secondary,
         borderWidth: 1,
         marginTop: 6,
-        marginBottom: 15
+        marginBottom: 15,
+        ...appStyles.text
+    },
+    button: {
+        color: FGColors.main
     },
     error: {
         color: "red",

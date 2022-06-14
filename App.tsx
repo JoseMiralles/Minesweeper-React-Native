@@ -2,6 +2,7 @@ import { View, StyleSheet } from "react-native";
 import { RecoilRoot, useRecoilValue } from "recoil";
 import GameBoard from "./components/GameBoard";
 import NewGameForm from "./components/NewGameForm";
+import { BGColors } from "./components/styles";
 import Game from "./game/Game";
 import { gameParamsState } from "./state";
 
@@ -39,7 +40,8 @@ const styleSheet = StyleSheet.create({
     flexDirection: "column",
     justifyContent: "center",
     alignContent: "center",
-    flexGrow: 1
+    flexGrow: 1,
+    backgroundColor: BGColors.main
   },
   text: {
     color: "red",

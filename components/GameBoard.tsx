@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { View, StyleSheet, FlatList, Text, ScrollView, TouchableOpacity, Vibration } from "react-native";
 import { useSetRecoilState } from "recoil";
 import Game from "../game/Game";
+import { BGColors, FGColors } from "./styles";
+import * as Haptics from "expo-haptics";
 
 interface IParams {
     game: Game
@@ -13,6 +15,9 @@ const GameBoard = ({game}: IParams) => {
 
     const onPress = ([row, col]: [number, number]) => {
         return () => {
+            if (game.board.grid[row][col].number === 0) {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+            }
             game.board.digSquare(row, col);
             setTotalMoves(totalMoves + 1);
         };
@@ -20,7 +25,7 @@ const GameBoard = ({game}: IParams) => {
     
     const onLongPress = ([row, col]: [number, number]) => {
         return () => {
-            Vibration.vibrate(100);
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             game.board.toggleFlagSquare(row, col);
             setTotalMoves(totalMoves + 1);
         }
@@ -64,7 +69,7 @@ const GameBoard = ({game}: IParams) => {
                                     styles.square,
                                     (square.status === "REVEALED") && styles.revealedSquare
                                 ]}>
-                                <Text style={{color: colors[square.number]}}>
+                                <Text style={{color: FGColors.main}}>
                                     {text}
                                 </Text>
                             </TouchableOpacity>
@@ -82,7 +87,6 @@ const styles = StyleSheet.create({
         flexDirection: "column",
         justifyContent: "center",
         alignContent: "center",
-        backgroundColor: "silver"
     },
     boardWrapper: {
         // flexGrow: 1,
@@ -99,10 +103,10 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         margin: 1,
-        backgroundColor: "darkgray",
+        backgroundColor: BGColors.secondary,
     },
     revealedSquare: {
-        backgroundColor: "white"
+        backgroundColor: BGColors.third
     }
 });
 
