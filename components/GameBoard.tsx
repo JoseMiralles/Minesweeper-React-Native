@@ -20,26 +20,30 @@ const GameBoard = ({game}: IParams) => {
     };
     
     return (
-        <View>
-            <FlatList
-                data={game.board.grid.flat()}
-                numColumns={game.size}
-                renderItem={({item: square}) => {
-                    return (
-                        <TouchableOpacity
-                            onPress={onPress(square.pos)}
-                            style={styles.square}>
-                            <Text>
-                                {
-                                    square.status === "REVEALED"
-                                    ? square.number
-                                    : "/"
+        <View style={styles.main}>
+            <View style={styles.boardWrapper}>
+                <FlatList
+                    style={styles.board}
+                    data={game.board.grid.flat()}
+                    numColumns={game.size}
+                    renderItem={({item: square}) => {
+                        return (
+                            <TouchableOpacity
+                                onPress={onPress(square.pos)}
+                                style={[
+                                    styles.square,
+                                    (square.status === "REVEALED") && styles.revealedSquare
+                                ]}>
+                                {square.status === "REVEALED" &&
+                                    <Text style={{color: colors[square.number]}}>
+                                        {square.number !== 0 ? square.number : ""}
+                                    </Text>
                                 }
-                            </Text>
-                        </TouchableOpacity>
-                    );
-                }}
-            />
+                            </TouchableOpacity>
+                        );
+                    }}
+                />
+            </View>
         </View>
     );
 };
@@ -49,18 +53,30 @@ const styles = StyleSheet.create({
         flexGrow: 1,
         flexDirection: "column",
         justifyContent: "center",
-        backgroundColor: "red"
+        alignContent: "center"
     },
-    row: {
-        flexDirection: "row",
-        backgroundColor: "green",
-        // alignItems: "center",
-        // justifyContent: "center",
-        width: "auto"
+    boardWrapper: {
+        // flexGrow: 1,
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    board: {
+        height: "auto",
     },
     square: {
-        padding: 3
+        width: 27,
+        height: 27,
+        justifyContent: "center",
+        alignItems: "center",
+        margin: 1,
+        backgroundColor: "silver",
+    },
+    revealedSquare: {
+        backgroundColor: "gray"
     }
 });
+
+const colors = ["blue", "green", "darkgreen", "yellow", "orange", "orangered", "red", "darkred"];
 
 export default GameBoard;

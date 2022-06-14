@@ -54,7 +54,8 @@ export default class Board {
              */
             if (square.number === 0) {
 
-                const que = [square];
+                const que: ISquare[] = [square];
+                const edges: ISquare[] = [];
                 const transforms = [
                     {x:0, y:-1},
                     {x:0, y:1},
@@ -64,30 +65,47 @@ export default class Board {
 
                 while (que.length > 0) {
 
-                    debugger;
-
                     const current = que.pop();
 
                     if (current) {
 
                         const x = current.pos[0];
                         const y = current.pos[1];
-                        console.log(`${current?.pos[0]},${current?.pos[1]}:\t${current?.status}`);
+                        // console.log(`${current?.pos[0]},${current?.pos[1]}:\t${current?.status}`);
                         
                         transforms.forEach(pos => {
 
                             if (
                                 this.isValidPosition(x + pos.x, y + pos.y) &&
-                                this.grid[x + pos.x][y + pos.y].status !== "REVEALED" &&
-                                this.grid[x + pos.x][y + pos.y].number === 0 &&
                                 this.grid[x + pos.x][y + pos.y].mine === false
                             ) {
-                                que.unshift(this.grid[x + pos.x][y + pos.y]);
-                                this.grid[x + pos.x][y + pos.y].status = "REVEALED";
+                                /**
+                                 * Add neighboring zeroes to the queue.
+                                 */
+                                if (
+                                    this.grid[x + pos.x][y + pos.y].status !== "REVEALED" &&
+                                    this.grid[x + pos.x][y + pos.y].number === 0
+                                ) {
+                                    que.unshift(this.grid[x + pos.x][y + pos.y]);
+                                    this.grid[x + pos.x][y + pos.y].status = "REVEALED";
+                                }
+    
+                                /**
+                                 * Add neighboring non-zeroes to the edge list.
+                                 */
+                                if (
+                                    this.grid[x + pos.x][y + pos.y].status !== "REVEALED" &&
+                                    this.grid[x + pos.x][y + pos.y].number !== 0
+                                ) {
+                                    edges.push(this.grid[x + pos.x][y + pos.y]);
+                                }
                             }
                         });
                     }
                 }
+
+                /** Reveal all of the edges. */
+                edges.forEach(e => e.status = "REVEALED");
             }
         }
     }
