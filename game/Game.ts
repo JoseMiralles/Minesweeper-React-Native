@@ -1,6 +1,6 @@
 import Board from "./Board";
 
-type gameState = "WON" | "LOST" | "STARTED";
+export type gameState = "WON" | "LOST" | "STARTED";
 
 export default class Game {
 

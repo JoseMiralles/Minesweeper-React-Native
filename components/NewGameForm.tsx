@@ -35,6 +35,10 @@ const NewGameForm = () => {
                 <Text style={styles.subtitle}>
                     by Jose Miralles
                 </Text>
+                <View style={styles.instructions}>
+                    <Text style={appStyles.text}>- Press on a square to dig it up.</Text>
+                    <Text style={appStyles.text}>- Press and hold on a square to flag it.</Text>
+                </View>
             </View>
 
             <View style={styles.form}>
@@ -56,13 +60,12 @@ const NewGameForm = () => {
                     value={totalMines.toString()}
                     onChangeText={(e)=>{setTotalMines((e as unknown as number))}}
                 />
+                <Button
+                    color={styles.button.color}
+                    title="play"
+                    onPress={createGame}
+                />
             </View>
-
-            <Button
-                color={styles.button.color}
-                title="play"
-                onPress={createGame}
-            />
         </KeyboardAvoidingView>
     );
 }
@@ -75,7 +78,7 @@ const styles = StyleSheet.create({
         flexGrow: 1,
         justifyContent: "space-around",
         alignContent: "center",
-        maxHeight: 800
+        maxHeight: 600
     },
     form: {
         flexDirection: "column",
@@ -92,12 +95,16 @@ const styles = StyleSheet.create({
         ...appStyles.text,
         margin: 5
     },
+    instructions: {
+        marginTop: 27,
+        marginBottom: 27
+    },
     label: {
-        color: BGColors.secondary
+        color: FGColors.textSecondary
     },
     TextInput: {
         padding: 10,
-        borderColor: BGColors.secondary,
+        borderColor: FGColors.textSecondary,
         borderWidth: 1,
         marginTop: 6,
         marginBottom: 15,
