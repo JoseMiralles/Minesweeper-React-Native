@@ -1,11 +1,12 @@
 
-type squareStatus = "FLAGGED" | "REVEALED" | "DEFAULT";
+type squareStatus = "REVEALED" | "DEFAULT";
 
 interface ISquare {
     mine: boolean;
     status: squareStatus;
     number: number;
     pos: [number, number];
+    flagged: boolean;
 }
 
 export default class Board {
@@ -24,6 +25,18 @@ export default class Board {
         if ((size * size) < totalMines) throw new Error("Too many mines!");
         this.goalSquares = (size * size) - totalMines;
         this.generateGrid();
+    }
+
+    /**
+     * Adds a flag to the given square.
+     * @param row 
+     * @param col 
+     */
+    toggleFlagSquare(row: number, col: number) {
+        if (this.isValidPosition(row, col)) {
+            const square = this.grid[row][col];
+            square.flagged = !square.flagged;
+        }
     }
 
     /**
@@ -56,11 +69,17 @@ export default class Board {
 
                 const que: ISquare[] = [square];
                 const edges: ISquare[] = [];
-                const transforms = [
+                const XYtransforms = [
                     {x:0, y:-1},
                     {x:0, y:1},
                     {x:-1, y:0},
                     {x:1, y:0},
+                ];
+                const diagonalTransforms = [
+                    {x: -1, y: -1},
+                    {x: -1, y: 1},
+                    {x: 1, y: -1},
+                    {x: 1, y: 1},
                 ];
 
                 while (que.length > 0) {
@@ -73,7 +92,7 @@ export default class Board {
                         const y = current.pos[1];
                         // console.log(`${current?.pos[0]},${current?.pos[1]}:\t${current?.status}`);
                         
-                        transforms.forEach(pos => {
+                        XYtransforms.forEach(pos => {
 
                             if (
                                 this.isValidPosition(x + pos.x, y + pos.y) &&
@@ -99,6 +118,20 @@ export default class Board {
                                 ) {
                                     edges.push(this.grid[x + pos.x][y + pos.y]);
                                 }
+                            }
+                        });
+
+                        /**
+                         * Add diagonal edges to the edges list.
+                         */
+                        diagonalTransforms.forEach(pos => {
+                            if (
+                                this.isValidPosition(x + pos.x, y + pos.y) &&
+                                this.grid[x + pos.x][y + pos.y].mine === false &&
+                                this.grid[x + pos.x][y + pos.y].status !== "REVEALED" &&
+                                this.grid[x + pos.x][y + pos.y].number !== 0
+                            ) {
+                                edges.push(this.grid[x + pos.x][y + pos.y]);
                             }
                         });
                     }
@@ -139,7 +172,7 @@ export default class Board {
             let c = 0;
             return Array.from({length: this.size}, () => {
                 c ++;
-                return {mine: false, status: "DEFAULT", number: 0, pos: [r - 1, c - 1]};
+                return {mine: false, status: "DEFAULT", number: 0, pos: [r - 1, c - 1], flagged: false};
             });
         });
 

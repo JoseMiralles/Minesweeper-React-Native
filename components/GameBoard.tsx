@@ -14,11 +14,18 @@ const GameBoard = ({game}: IParams) => {
     const onPress = ([row, col]: [number, number]) => {
         return () => {
             game.board.digSquare(row, col);
-            console.log(game.board.print());
             setTotalMoves(totalMoves + 1);
         };
     };
     
+    const onLongPress = ([row, col]: [number, number]) => {
+        return () => {
+            game.board.toggleFlagSquare(row, col);
+            debugger;
+            setTotalMoves(totalMoves + 1);
+        }
+    }
+
     return (
         <View style={styles.main}>
             <View style={styles.boardWrapper}>
@@ -26,17 +33,33 @@ const GameBoard = ({game}: IParams) => {
                     style={styles.board}
                     data={game.board.grid.flat()}
                     numColumns={game.size}
+                    columnWrapperStyle={{flexWrap: "nowrap"}}
                     renderItem={({item: square}) => {
+
+                        let text = "";
+                        if (square.mine) text = "*";
+                        else if (square.number !== 0) text = square.number.toString();
+                        if (square.flagged) text = "F";
+
                         return (
                             <TouchableOpacity
-                                onPress={onPress(square.pos)}
+                                onPress={
+                                    (square.status !== "REVEALED") ?
+                                    onPress(square.pos)
+                                    : undefined
+                                }
+                                onLongPress={
+                                    (square.status !== "REVEALED") ?
+                                    onLongPress(square.pos)
+                                    : undefined
+                                }
                                 style={[
                                     styles.square,
                                     (square.status === "REVEALED") && styles.revealedSquare
                                 ]}>
                                 {square.status === "REVEALED" &&
                                     <Text style={{color: colors[square.number]}}>
-                                        {square.number !== 0 ? square.number : ""}
+                                        {text}
                                     </Text>
                                 }
                             </TouchableOpacity>
@@ -53,7 +76,8 @@ const styles = StyleSheet.create({
         flexGrow: 1,
         flexDirection: "column",
         justifyContent: "center",
-        alignContent: "center"
+        alignContent: "center",
+        backgroundColor: "silver"
     },
     boardWrapper: {
         // flexGrow: 1,
@@ -65,18 +89,18 @@ const styles = StyleSheet.create({
         height: "auto",
     },
     square: {
-        width: 27,
-        height: 27,
+        width: 35,
+        height: 35,
         justifyContent: "center",
         alignItems: "center",
         margin: 1,
-        backgroundColor: "silver",
+        backgroundColor: "darkgray",
     },
     revealedSquare: {
-        backgroundColor: "gray"
+        backgroundColor: "white"
     }
 });
 
-const colors = ["blue", "green", "darkgreen", "yellow", "orange", "orangered", "red", "darkred"];
+const colors = ["blue", "blue", "green", "darkgreen", "yellow", "orange", "orangered", "red", "darkred"];
 
 export default GameBoard;
