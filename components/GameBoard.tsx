@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet, FlatList, Text, ScrollView, TouchableOpacity, Vibration, SafeAreaView } from "react-native";
+import { View, StyleSheet, FlatList, Text, ScrollView, TouchableOpacity, Vibration, SafeAreaView, ViewStyle, TextStyle } from "react-native";
 import { useSetRecoilState } from "recoil";
 import Game from "../game/Game";
 import { BGColors, FGColors } from "./styles";
@@ -92,28 +92,50 @@ const getTextAndStyle =
     (square: ISquare, gameLost: boolean):
     {text: string; styleKey: keyof typeof squareStyles} => {
 
+    /**
+     * All the mines need to be shown if the game is lost.
+     */
     if (square.mine && gameLost)
     return {
         text: "*",
         styleKey: "mine"
     }
 
-    if (square.status === "REVEALED" && square.number !== 0)
+    /**
+     * Show revealed square. Do not show number for "0" squares.
+     */
+    if (square.status === "REVEALED")
         return {
-            text: square.number.toString(),
+            text: square.number !== 0 ? square.number.toString() : "",
             styleKey: "revealed"
         }
     
+    /**
+     * Flagged squares
+     */
     if (square.flagged && square.status === "DEFAULT")
         return {
             text: "F",
             styleKey: "flagged"
         };
 
+    /**
+     * Default squares (not revealed, or flagged)
+     */
     return {
         text: "",
         styleKey: "square"
     };
+};
+
+const defaultSquare: ViewStyle | TextStyle = {
+    width: 35,
+    height: 35,
+    justifyContent: "center",
+    alignItems: "center",
+    margin: 1,
+    backgroundColor: BGColors.secondary,
+    color: FGColors.main
 };
 
 const styles = StyleSheet.create({
@@ -131,35 +153,26 @@ const styles = StyleSheet.create({
         backgroundColor: BGColors.secondary,
         color: FGColors.main
     },
-    revealedSquare: {
-        backgroundColor: BGColors.third
-    },
-    mine: {
-        backgroundColor: FGColors.warning,
-        fontWeight: "bold",
-        fontSize: 30
-    },
-    flagged: {
-        color: FGColors.warning
-    }
 });
 
 /**
  * Used to avoid mergin styles for every square in the board.
  */
 const squareStyles = StyleSheet.create({
-    square: styles.square,
+    square: defaultSquare,
     revealed: {
-        ...styles.square,
-        ...styles.revealedSquare
+        ...defaultSquare,
+        backgroundColor: BGColors.third
     },
     mine: {
         ...styles.square,
-        ...styles.mine
+        backgroundColor: FGColors.warning,
+        fontWeight: "bold",
+        fontSize: 30
     },
     flagged: {
         ...styles.square,
-        ...styles.flagged
+        color: FGColors.warning
     }
 });
 
