@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { View, StyleSheet, FlatList, Text, ScrollView, TouchableOpacity, Vibration, SafeAreaView, ViewStyle, TextStyle } from "react-native";
 import { useSetRecoilState } from "recoil";
 import Game from "../game/Game";
-import { BGColors, FGColors } from "./styles";
+import { appStyles, BGColors, FGColors } from "./styles";
 import * as Haptics from "expo-haptics";
 import GameEndedComponent from "./GameEndedComponent";
 import { ISquare } from "../game/Board";
@@ -48,7 +48,7 @@ const GameBoard = ({game}: IParams) => {
                 columnWrapperStyle={{ flexWrap: "nowrap" }}
                 renderItem={({ item: square }) => {
 
-                    const {text, styleKey} = getTextAndStyle(square, gameLost);
+                    const {text, styleKey, textStyleKey} = getTextAndStyle(square, gameLost);
 
                     return (
                         <TouchableOpacity
@@ -62,8 +62,8 @@ const GameBoard = ({game}: IParams) => {
                                     ? onLongPress(square.pos)
                                     : undefined
                             }
-                            style={squareStyles[styleKey]}>
-                            <Text style={{ color: squareStyles[styleKey].color }}>
+                            style={ squareStyles[styleKey]} >
+                            <Text style={ squareTextStyles[textStyleKey] }>
                                 {text}
                             </Text>
                         </TouchableOpacity>
@@ -88,9 +88,9 @@ const GameBoard = ({game}: IParams) => {
     );
 };
 
-const getTextAndStyle =
-    (square: ISquare, gameLost: boolean):
-    {text: string; styleKey: keyof typeof squareStyles} => {
+const getTextAndStyle =(
+    square: ISquare, gameLost: boolean
+): {text: string; styleKey: keyof typeof squareStyles; textStyleKey: keyof typeof squareTextStyles} => {
 
     /**
      * All the mines need to be shown if the game is lost.
@@ -98,7 +98,8 @@ const getTextAndStyle =
     if (square.mine && gameLost)
     return {
         text: "*",
-        styleKey: "mine"
+        styleKey: "mine",
+        textStyleKey: "mine"
     }
 
     /**
@@ -107,7 +108,8 @@ const getTextAndStyle =
     if (square.status === "REVEALED")
         return {
             text: square.number !== 0 ? square.number.toString() : "",
-            styleKey: "revealed"
+            styleKey: "revealed",
+            textStyleKey: "revealed"
         }
     
     /**
@@ -116,7 +118,8 @@ const getTextAndStyle =
     if (square.flagged && square.status === "DEFAULT")
         return {
             text: "F",
-            styleKey: "flagged"
+            styleKey: "flagged",
+            textStyleKey: "flagged"
         };
 
     /**
@@ -124,18 +127,9 @@ const getTextAndStyle =
      */
     return {
         text: "",
-        styleKey: "square"
+        styleKey: "square",
+        textStyleKey: "default"
     };
-};
-
-const defaultSquare: ViewStyle | TextStyle = {
-    width: 35,
-    height: 35,
-    justifyContent: "center",
-    alignItems: "center",
-    margin: 1,
-    backgroundColor: BGColors.secondary,
-    color: FGColors.main
 };
 
 const styles = StyleSheet.create({
@@ -143,7 +137,9 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: "center"
     },
-    board: {},
+    board: { // Flatlist
+        padding: 100
+    },
     square: {
         width: 35,
         height: 35,
@@ -154,6 +150,15 @@ const styles = StyleSheet.create({
         color: FGColors.main
     },
 });
+
+const defaultSquare: ViewStyle | TextStyle = {
+    width: 35,
+    height: 35,
+    justifyContent: "center",
+    alignItems: "center",
+    margin: 1,
+    backgroundColor: BGColors.secondary,
+};
 
 /**
  * Used to avoid mergin styles for every square in the board.
@@ -166,14 +171,30 @@ const squareStyles = StyleSheet.create({
     },
     mine: {
         ...styles.square,
-        backgroundColor: FGColors.warning,
-        fontWeight: "bold",
-        fontSize: 30
+        backgroundColor: FGColors.main,
     },
     flagged: {
         ...styles.square,
-        color: FGColors.warning
     }
+});
+
+const squareTextStyles = StyleSheet.create({
+    mine: {
+        fontWeight: "bold",
+        fontSize: 30,
+        lineHeight: 45,
+        color: BGColors.third
+    },
+    revealed: {
+        color: FGColors.main
+    },
+    flagged: {
+        color: FGColors.main,
+        fontWeight: "bold",
+        fontStyle: "italic",
+        fontSize: 20
+    },
+    default: {}
 });
 
 export default GameBoard;
