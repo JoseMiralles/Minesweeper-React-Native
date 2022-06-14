@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet, FlatList, Text, ScrollView, TouchableOpacity } from "react-native";
+import { View, StyleSheet, FlatList, Text, ScrollView, TouchableOpacity, Vibration } from "react-native";
 import { useSetRecoilState } from "recoil";
 import Game from "../game/Game";
 
@@ -20,8 +20,8 @@ const GameBoard = ({game}: IParams) => {
     
     const onLongPress = ([row, col]: [number, number]) => {
         return () => {
+            Vibration.vibrate(100);
             game.board.toggleFlagSquare(row, col);
-            debugger;
             setTotalMoves(totalMoves + 1);
         }
     }
@@ -37,9 +37,16 @@ const GameBoard = ({game}: IParams) => {
                     renderItem={({item: square}) => {
 
                         let text = "";
-                        if (square.mine) text = "*";
-                        else if (square.number !== 0) text = square.number.toString();
-                        if (square.flagged) text = "F";
+
+                        if (square.status === "REVEALED") {
+
+                            if (square.mine) text = "*";
+                            else if (square.number !== 0) text = square.number.toString();
+                        }
+                        else if (square.flagged && square.status === "DEFAULT") {
+
+                            text = "F";
+                        }
 
                         return (
                             <TouchableOpacity
@@ -57,11 +64,9 @@ const GameBoard = ({game}: IParams) => {
                                     styles.square,
                                     (square.status === "REVEALED") && styles.revealedSquare
                                 ]}>
-                                {square.status === "REVEALED" &&
-                                    <Text style={{color: colors[square.number]}}>
-                                        {text}
-                                    </Text>
-                                }
+                                <Text style={{color: colors[square.number]}}>
+                                    {text}
+                                </Text>
                             </TouchableOpacity>
                         );
                     }}
