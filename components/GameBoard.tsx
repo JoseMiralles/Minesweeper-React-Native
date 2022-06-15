@@ -6,6 +6,8 @@ import * as Haptics from "expo-haptics";
 import GameEndedComponent from "./GameEndedComponent";
 import { ISquare } from "../game/Board";
 
+//#region Rendering
+
 interface IParams {
     game: Game
 }
@@ -31,6 +33,7 @@ const GameBoard = ({game}: IParams) => {
     
     const onLongPress = ([row, col]: [number, number]) => {
         return () => {
+            console.log("LONG PRESS");
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             game.board.toggleFlagSquare(row, col);
             setTotalMoves(totalMoves + 1);
@@ -43,8 +46,8 @@ const GameBoard = ({game}: IParams) => {
                 contentContainerStyle={styles.board}
                 style={styles.flatList}
                 data={game.board.grid.flat()}
-                numColumns={game.size}
-                columnWrapperStyle={{ flexWrap: "nowrap" }}
+                numColumns={game.size} // n x n grid, so n columns
+                // columnWrapperStyle={{ flexWrap: "nowrap" }}
                 renderItem={({ item: square }) => {
 
                     const {text, styleKey, textStyleKey} = getTextAndStyle(square, gameLost);
@@ -90,11 +93,11 @@ const getTextAndStyle =(
      * All the mines need to be shown if the game is lost.
      */
     if (square.mine && gameLost)
-    return {
-        text: "*",
-        styleKey: "mine",
-        textStyleKey: "mine"
-    }
+        return {
+            text: "*",
+            styleKey: "mine",
+            textStyleKey: "mine"
+        }
 
     /**
      * Show revealed square. Do not show number for "0" squares.
@@ -126,31 +129,24 @@ const getTextAndStyle =(
     };
 };
 
+//#endregion
+
 //#region Styling
 
 const styles = StyleSheet.create({
     main: {
         flex: 1,
         // flexGrow: 1,
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        backgroundColor: "black"
+        // flexDirection: "column",
+        // alignItems: "center",
+        // justifyContent: "center",
+        backgroundColor: "black",
     },
     flatList: {
     },
     board: { // Flatlist content
         flexGrow: 1,
-        justifyContent: "center"
-    },
-    square: {
-        width: 35,
-        height: 35,
-        justifyContent: "center",
-        alignItems: "center",
-        margin: 1,
-        backgroundColor: BGColors.secondary,
-        color: FGColors.main
+        // justifyContent: "center"
     },
 });
 
@@ -164,7 +160,7 @@ const defaultSquare: ViewStyle | TextStyle = {
 };
 
 /**
- * Used to avoid mergin styles for every square in the board.
+ * This is used to avoid having to merge styles whenever each square is rendered.
  */
 const squareStyles = StyleSheet.create({
     square: defaultSquare,
@@ -173,11 +169,11 @@ const squareStyles = StyleSheet.create({
         backgroundColor: BGColors.third
     },
     mine: {
-        ...styles.square,
+        ...defaultSquare,
         backgroundColor: FGColors.main,
     },
     flagged: {
-        ...styles.square,
+        ...defaultSquare,
     }
 });
 

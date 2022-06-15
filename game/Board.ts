@@ -143,7 +143,7 @@ export default class Board {
             }
 
             if (this.totalSquaresRevealed === this.goalSquaresRevealed) this.completed = true;
-            console.table({GOAL: this.goalSquaresRevealed, CURRENT: this.totalSquaresRevealed});
+            // console.table({GOAL: this.goalSquaresRevealed, CURRENT: this.totalSquaresRevealed});
         }
     }
 
