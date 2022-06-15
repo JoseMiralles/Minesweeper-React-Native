@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { TextInput, View, Text, Button, StyleSheet, KeyboardAvoidingView, SafeAreaView } from "react-native";
 import { useSetRecoilState } from "recoil";
 import Game from "../game/Game";
@@ -20,6 +20,8 @@ const NewGameForm = () => {
             setGameParams({ size, totalMines });
         }
     };
+
+    useEffect(()=>{createGame()}, []);
 
     return (
         <SafeAreaView style={styles.main}>

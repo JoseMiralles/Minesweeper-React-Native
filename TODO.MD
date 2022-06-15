@@ -1,1 +1,2 @@
 - Memoize grid squares.
+- Fix horizontal scrolling on Android.

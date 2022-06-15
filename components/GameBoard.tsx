@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
     main: {
         flex: 1,
         // flexGrow: 1,
-        // flexDirection: "column",
+        flexDirection: "column",
         // alignItems: "center",
         // justifyContent: "center",
         backgroundColor: "black",
