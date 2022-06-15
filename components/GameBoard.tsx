@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet, FlatList, Text, ScrollView, TouchableOpacity, Vibration, SafeAreaView, ViewStyle, TextStyle } from "react-native";
-import { useSetRecoilState } from "recoil";
+import { View, StyleSheet, FlatList, Text, TouchableOpacity, Vibration, SafeAreaView, ViewStyle, TextStyle, LayoutChangeEvent } from "react-native";
 import Game from "../game/Game";
-import { appStyles, BGColors, FGColors } from "./styles";
+import { BGColors, FGColors } from "./styles";
 import * as Haptics from "expo-haptics";
 import GameEndedComponent from "./GameEndedComponent";
 import { ISquare } from "../game/Board";
@@ -20,7 +19,6 @@ const GameBoard = ({game}: IParams) => {
 
     const onPress = ([row, col]: [number, number]) => {
         return () => {
-
             if (game.board.grid[row][col].mine)
                 Vibration.vibrate(3000);
             else if (game.board.grid[row][col].number === 0)
@@ -42,7 +40,8 @@ const GameBoard = ({game}: IParams) => {
     const content = (
         <>
             <FlatList
-                style={styles.board}
+                contentContainerStyle={styles.board}
+                style={styles.flatList}
                 data={game.board.grid.flat()}
                 numColumns={game.size}
                 columnWrapperStyle={{ flexWrap: "nowrap" }}
@@ -73,18 +72,13 @@ const GameBoard = ({game}: IParams) => {
         </>
     );
 
-    if (gameEnded)
-        return (
-            <SafeAreaView style={styles.main}>
-                {content}
-                <GameEndedComponent gameState={game.gameStatus()} />
-            </SafeAreaView>
-        );
-
     return (
-        <View style={styles.main}>
-            {content}
-        </View>
+        <SafeAreaView
+            style={styles.main}
+        >
+            { content }
+            { gameEnded && <GameEndedComponent gameState={game.gameStatus()} /> }
+        </SafeAreaView>
     );
 };
 
@@ -132,13 +126,22 @@ const getTextAndStyle =(
     };
 };
 
+//#region Styling
+
 const styles = StyleSheet.create({
     main: {
         flex: 1,
-        alignItems: "center"
+        // flexGrow: 1,
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: "black"
     },
-    board: { // Flatlist
-        padding: 100
+    flatList: {
+    },
+    board: { // Flatlist content
+        flexGrow: 1,
+        justifyContent: "center"
     },
     square: {
         width: 35,
@@ -196,5 +199,7 @@ const squareTextStyles = StyleSheet.create({
     },
     default: {}
 });
+
+//#endregion
 
 export default GameBoard;

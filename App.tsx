@@ -13,17 +13,8 @@ const InnerApp = () => {
   let game: Game | undefined;
   if (gameParams) game = new Game(gameParams.size, gameParams.totalMines);
 
-  return (
-    <View style={styleSheet.main}>
-
-    {
-      game !== undefined ?
-        <GameBoard game={game}/>
-        : <NewGameForm />
-    }
-
-  </View>
-  );
+  if (game !== undefined) return <GameBoard game={game}/>
+  return <NewGameForm/>
 };
 
 const App = () => {
@@ -37,10 +28,7 @@ const App = () => {
 
 const styleSheet = StyleSheet.create({
   main: {
-    flexDirection: "column",
-    justifyContent: "center",
-    alignContent: "center",
-    flexGrow: 1,
+    flex: 1,
     backgroundColor: BGColors.main
   },
   text: {

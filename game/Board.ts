@@ -15,15 +15,15 @@ export default class Board {
     public completed = false;
     public grid: ISquare[][] = [];
     
-    private openedSquares = 0;
-    private goalSquares;
+    private totalSquaresRevealed = 0;
+    private goalSquaresRevealed;
 
     constructor (
         private size: number,
         private totalMines: number
     ) {
         if ((size * size) < totalMines) throw new Error("Too many mines!");
-        this.goalSquares = (size * size) - totalMines;
+        this.goalSquaresRevealed = (size * size) - totalMines;
         this.generateGrid();
     }
 
@@ -60,6 +60,8 @@ export default class Board {
                 return;
             }
 
+            this.totalSquaresRevealed ++;
+
             /**
              * Check if this is a "zero" square.
              * If it is, reveal the island of "zeroes" connected to
@@ -68,7 +70,6 @@ export default class Board {
             if (square.number === 0) {
 
                 const que: ISquare[] = [square];
-                const edges: ISquare[] = [];
                 const XYtransforms = [
                     {x:0, y:-1},
                     {x:0, y:1},
@@ -107,22 +108,24 @@ export default class Board {
                                 ) {
                                     que.unshift(this.grid[x + pos.x][y + pos.y]);
                                     this.grid[x + pos.x][y + pos.y].status = "REVEALED";
+                                    this.totalSquaresRevealed ++;
                                 }
     
                                 /**
-                                 * Add neighboring non-zeroes to the edge list.
+                                 * Reveal diogonally nighboring non-seroes (edges).
                                  */
                                 if (
                                     this.grid[x + pos.x][y + pos.y].status !== "REVEALED" &&
                                     this.grid[x + pos.x][y + pos.y].number !== 0
                                 ) {
-                                    edges.push(this.grid[x + pos.x][y + pos.y]);
+                                    this.grid[x + pos.x][y + pos.y].status = "REVEALED";
+                                    this.totalSquaresRevealed ++;
                                 }
                             }
                         });
 
                         /**
-                         * Add diagonal edges to the edges list.
+                         * reveal diagonal edges.
                          */
                         diagonalTransforms.forEach(pos => {
                             if (
@@ -131,15 +134,16 @@ export default class Board {
                                 this.grid[x + pos.x][y + pos.y].status !== "REVEALED" &&
                                 this.grid[x + pos.x][y + pos.y].number !== 0
                             ) {
-                                edges.push(this.grid[x + pos.x][y + pos.y]);
+                                this.grid[x + pos.x][y + pos.y].status = "REVEALED";
+                                this.totalSquaresRevealed ++;
                             }
                         });
                     }
                 }
-
-                /** Reveal all of the edges. */
-                edges.forEach(e => e.status = "REVEALED");
             }
+
+            if (this.totalSquaresRevealed === this.goalSquaresRevealed) this.completed = true;
+            console.table({GOAL: this.goalSquaresRevealed, CURRENT: this.totalSquaresRevealed});
         }
     }
 
