@@ -1,6 +1,5 @@
 import { TextStyle, TouchableOpacity, ViewStyle, StyleSheet, Text } from "react-native";
-import { ISquare, squareStatus } from "../game/Board";
-import Game from "../game/Game";
+import { ISquare } from "../game/Board";
 import { BGColors, FGColors } from "./styles";
 
 interface IParams {

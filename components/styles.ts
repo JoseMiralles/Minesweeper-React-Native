@@ -10,6 +10,7 @@ export const BGColors = {
 export const FGColors = {
     main: "#ADE25D",
     textSecondary: "#C2DFE3",
+    label: "dimgray",
     text: "#C2DFE3",
     warning: "red"
 } as const;

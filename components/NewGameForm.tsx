@@ -14,12 +14,30 @@ const NewGameForm = () => {
     const setGameParams = useSetRecoilState(gameParamsState);
 
     const createGame = () => {
-        if ((size * size) < totalMines) {
-            setErrors(["There are more mines than squares!"]);
-        } else {
-            setGameParams({ size, totalMines });
+
+        const newErrors: string[] = [];
+        const squares = size * size;
+
+        if (squares < totalMines)
+            newErrors.push("There are more mines than squares!");
+
+        if (size < 2)
+            newErrors.push("Size is too small!");
+            
+        if (size > 50)
+            newErrors.push("Size is too big!");
+
+        if (newErrors.length) {
+            setErrors(newErrors);
+            return;
         }
+
+        setGameParams({ size, totalMines });
     };
+
+    const sizeText = (size > 1)
+    ? `( ${size} x ${size} = ${size*size} squares. )`
+    : "";
 
     return (
         <SafeAreaView style={styles.main}>
@@ -37,8 +55,8 @@ const NewGameForm = () => {
                         by Jose Miralles
                     </Text>
                     <View style={styles.instructions}>
-                        <Text style={appStyles.text}>- Press on a square to dig it up.</Text>
-                        <Text style={appStyles.text}>- Press and hold on a square to flag it.</Text>
+                        <Text style={appStyles.text}>* Press on a square to dig it up.</Text>
+                        <Text style={appStyles.text}>* Press and hold on a square to flag it.</Text>
                     </View>
                 </View>
 
@@ -47,7 +65,7 @@ const NewGameForm = () => {
                         {errors.map((e, i) => (<Text style={styles.error} key={i}>{e}</Text>))}
                     </View>
 
-                    <Text style={styles.label}>Board Size:</Text>
+                    <Text style={styles.label}>Board Size: {sizeText}</Text>
                     <TextInput
                         keyboardType="numeric"
                         style={styles.TextInput}
@@ -103,14 +121,17 @@ const styles = StyleSheet.create({
     },
     instructions: {
         marginTop: 27,
-        marginBottom: 27
+        marginBottom: 27,
+        backgroundColor: BGColors.third,
+        padding: 20,
+        borderRadius: 10
     },
     label: {
-        color: FGColors.textSecondary
+        color: FGColors.label
     },
     TextInput: {
         padding: 10,
-        borderColor: FGColors.textSecondary,
+        borderColor: FGColors.label,
         borderWidth: 1,
         marginTop: 6,
         marginBottom: 15,
