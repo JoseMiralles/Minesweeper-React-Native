@@ -1,1 +1,2 @@
 - Memoize grid squares.
+- Flatten board when game is first created.

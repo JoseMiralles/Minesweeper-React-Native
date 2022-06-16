@@ -8,7 +8,7 @@ import { BGColors, FGColors, appStyles } from "./styles";
 const NewGameForm = () => {
 
     const [size, setSize] = useState(20);
-    const [totalMines, setTotalMines] = useState(8);
+    const [totalMines, setTotalMines] = useState(50);
     const [errors, setErrors] = useState<string[]>([]);
 
     const setGameParams = useSetRecoilState(gameParamsState);

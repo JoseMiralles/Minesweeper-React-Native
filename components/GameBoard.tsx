@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { View, StyleSheet, FlatList, Text, TouchableOpacity, Vibration, SafeAreaView, ViewStyle, TextStyle, LayoutChangeEvent } from "react-native";
+import React, { useState } from "react";
+import { StyleSheet, FlatList, Text, TouchableOpacity, Vibration, SafeAreaView, ViewStyle, TextStyle, ScrollView, Platform } from "react-native";
 import Game from "../game/Game";
 import { BGColors, FGColors } from "./styles";
 import * as Haptics from "expo-haptics";
@@ -21,10 +21,8 @@ const GameBoard = ({game}: IParams) => {
 
     const onPress = ([row, col]: [number, number]) => {
         return () => {
-            if (game.board.grid[row][col].mine)
-                Vibration.vibrate(3000);
-            else if (game.board.grid[row][col].number === 0)
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+            if (game.board.grid[row][col].mine) vibrate(3);
+            else if (game.board.grid[row][col].number === 0) vibrate(2);
 
             game.board.digSquare(row, col);
             setTotalMoves(totalMoves + 1);
@@ -33,8 +31,7 @@ const GameBoard = ({game}: IParams) => {
     
     const onLongPress = ([row, col]: [number, number]) => {
         return () => {
-            console.log("LONG PRESS");
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            vibrate(1);
             game.board.toggleFlagSquare(row, col);
             setTotalMoves(totalMoves + 1);
         }
@@ -43,11 +40,10 @@ const GameBoard = ({game}: IParams) => {
     const content = (
         <>
             <FlatList
+                overScrollMode="always"
                 contentContainerStyle={styles.board}
-                style={styles.flatList}
                 data={game.board.grid.flat()}
                 numColumns={game.size} // n x n grid, so n columns
-                // columnWrapperStyle={{ flexWrap: "nowrap" }}
                 renderItem={({ item: square }) => {
 
                     const {text, styleKey, textStyleKey} = getTextAndStyle(square, gameLost);
@@ -79,12 +75,42 @@ const GameBoard = ({game}: IParams) => {
         <SafeAreaView
             style={styles.main}
         >
-            { content }
+            {
+                Platform.OS === "android"
+                ? <ScrollView style={styles.container} horizontal>{content}</ScrollView>
+                : content
+            }
             { gameEnded && <GameEndedComponent gameState={game.gameStatus()} /> }
         </SafeAreaView>
     );
 };
 
+/**
+ * Vibrates based on the provided setting.
+ * Attempts to do so only on ios and android.
+ */
+const vibrate = (
+    strength: 1 | 2 | 3
+) => {
+    if (Platform.OS === "ios" || Platform.OS === "android") {
+        switch (strength){
+            case 1:
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            break;
+            case 2:
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+            break;
+            case 3:
+                Vibration.vibrate(2000);
+            break;
+        }
+    }
+}
+
+/**
+ * Returns the correct text, and styling for each square.
+ * TODO: Replace this with memoization.
+ */
 const getTextAndStyle =(
     square: ISquare, gameLost: boolean
 ): {text: string; styleKey: keyof typeof squareStyles; textStyleKey: keyof typeof squareTextStyles} => {
@@ -136,13 +162,16 @@ const getTextAndStyle =(
 const styles = StyleSheet.create({
     main: {
         flex: 1,
-        // flexGrow: 1,
-        // flexDirection: "column",
-        // alignItems: "center",
-        // justifyContent: "center",
+        flexGrow: 1,
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
         backgroundColor: "black",
     },
     flatList: {
+    },
+    container: {
+        flex: 1
     },
     board: { // Flatlist content
         flexGrow: 1,
