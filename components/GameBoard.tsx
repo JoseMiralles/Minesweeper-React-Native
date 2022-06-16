@@ -1,10 +1,11 @@
-import React, { useState } from "react";
-import { StyleSheet, FlatList, SafeAreaView, ScrollView, Platform } from "react-native";
+import React, { useEffect, useState } from "react";
+import { StyleSheet, FlatList, SafeAreaView, ScrollView, Platform, ActivityIndicator } from "react-native";
 import { ISquare } from "../game/Board";
 import Game from "../game/Game";
 import { vibrate } from "../util";
 import GameEndedComponent from "./GameEndedComponent";
 import Square from "./Square";
+import { FGColors } from "./styles";
 
 interface IParams {
     game: Game
@@ -17,6 +18,7 @@ const useForceBoardUpdate = () => {
 
 const GameBoard = ({game}: IParams) => {
 
+    const [loading, setLoading] = useState(false);
     const updateBoard = useForceBoardUpdate();
 
     const gameEnded: boolean = (game.gameStatus() !== "STARTED");
@@ -27,8 +29,12 @@ const GameBoard = ({game}: IParams) => {
         return () => {
             if (square.mine) vibrate(3);
             else if (square.number === 0) vibrate(2);
-            game.board.digSquare(square.pos[0], square.pos[1]);
-            updateBoard();
+            setLoading(true);
+            (async () => {
+                game.board.digSquare(square.pos[0], square.pos[1]);
+                updateBoard();
+                setLoading(false)
+            })();
         };
     };
     
@@ -36,8 +42,12 @@ const GameBoard = ({game}: IParams) => {
         if (square.status === "REVEALED") return undefined;
         return () => {
             vibrate(1);
-            game.board.toggleFlagSquare(square.pos[0], square.pos[1]);
-            updateBoard();
+            setLoading(true);
+            (async () => {
+                game.board.toggleFlagSquare(square.pos[0], square.pos[1]);
+                updateBoard();
+                setLoading(false);
+            })();
         }
     }
 
@@ -69,6 +79,10 @@ const GameBoard = ({game}: IParams) => {
                 ? <ScrollView style={styles.container} horizontal>{content}</ScrollView>
                 : content
             }
+            { loading && <ActivityIndicator
+                style={styles.loadingSpinner}
+                color={FGColors.main}
+                size="large"/> }
             { gameEnded && <GameEndedComponent gameState={game.gameStatus()} /> }
         </SafeAreaView>
     );
@@ -87,6 +101,9 @@ const styles = StyleSheet.create({
     },
     container: {
         flex: 1
+    },
+    loadingSpinner: {
+        position: "absolute"
     },
     board: { // Flatlist content
         flexGrow: 1,
