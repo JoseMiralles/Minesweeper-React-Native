@@ -1,5 +1,5 @@
 
-type squareStatus = "REVEALED" | "DEFAULT";
+export type squareStatus = "REVEALED" | "DEFAULT";
 
 export interface ISquare {
     mine: boolean;
