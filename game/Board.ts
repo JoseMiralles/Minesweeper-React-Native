@@ -14,6 +14,7 @@ export default class Board {
     public mineTriggered = false;
     public completed = false;
     public grid: ISquare[][] = [];
+    public flattenedGrid: ISquare[];
     
     private totalSquaresRevealed = 0;
     private goalSquaresRevealed;
@@ -25,6 +26,7 @@ export default class Board {
         if ((size * size) < totalMines) throw new Error("Too many mines!");
         this.goalSquaresRevealed = (size * size) - totalMines;
         this.generateGrid();
+        this.flattenedGrid = this.grid.flat()
     }
 
     /**

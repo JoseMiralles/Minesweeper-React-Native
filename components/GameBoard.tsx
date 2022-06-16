@@ -42,7 +42,7 @@ const GameBoard = ({game}: IParams) => {
             <FlatList
                 overScrollMode="always"
                 contentContainerStyle={styles.board}
-                data={game.board.grid.flat()}
+                data={game.board.flattenedGrid}
                 numColumns={game.size} // n x n grid, so n columns
                 renderItem={({ item: square }) => {
 
