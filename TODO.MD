@@ -1,0 +1,1 @@
+Add difficulty setting instead of number of mines.

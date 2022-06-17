@@ -3,12 +3,13 @@ import { TextInput, View, Text, Button, StyleSheet, KeyboardAvoidingView, SafeAr
 import { useSetRecoilState } from "recoil";
 import Game from "../game/Game";
 import { gameParamsState } from "../state";
+import RadioSet from "./RadioSet";
 import { BGColors, FGColors, appStyles } from "./styles";
 
 const NewGameForm = () => {
 
     const [size, setSize] = useState(20);
-    const [totalMines, setTotalMines] = useState(50);
+    const [difficulty, setDifficulty] = useState(1);
     const [errors, setErrors] = useState<string[]>([]);
 
     const setGameParams = useSetRecoilState(gameParamsState);
@@ -17,14 +18,12 @@ const NewGameForm = () => {
 
         const newErrors: string[] = [];
         const squares = size * size;
+        const totalMines = Math.ceil((difficulty * 0.1) * squares);
 
-        if (squares < totalMines)
-            newErrors.push("There are more mines than squares!");
-
-        if (size < 2)
+        if (size < 3)
             newErrors.push("Size is too small!");
             
-        if (size > 50)
+        if (size > 100)
             newErrors.push("Size is too big!");
 
         if (newErrors.length) {
@@ -72,13 +71,22 @@ const NewGameForm = () => {
                         value={size.toString()}
                         onChangeText={(e) => { setSize((e as unknown as number)) }} />
 
-                    <Text style={styles.label}>Total Mines:</Text>
+                    {/* <Text style={styles.label}>Total Mines:</Text>
                     <TextInput
                         keyboardType="numeric"
                         style={styles.TextInput}
                         value={totalMines.toString()}
                         onChangeText={(e) => { setTotalMines((e as unknown as number)) }}
-                    />
+                    /> */}
+                    <Text style={styles.label}>Difficulty:</Text>
+                    <RadioSet
+                        style={styles.radioSet}
+                        selections={[
+                            { text: "easy", value: 1 },
+                            { text: "medium", value: 2 },
+                            { text: "hard", value: 3 },
+                        ]}
+                        onSelection={(sel)=>{setDifficulty(sel.value)}}/>
                     <Button
                         color={styles.button.color}
                         title="play"
@@ -113,6 +121,10 @@ const styles = StyleSheet.create({
         textAlign: "center",
         margin: 5,
         fontWeight: "bold"
+    },
+    radioSet: {
+        margin: 5,
+        marginBottom: 20
     },
     subtitle: {
         textAlign: "center",
